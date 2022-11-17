@@ -27,7 +27,13 @@ export class UsersService {
   }
 
   async findUserName(username: string) {
-    return await this.prismaService.users.findUnique({ where: { username } });
+    const user = await this.prismaService.users.findUnique({
+      where: { username },
+    });
+    if (!user) {
+      throw new Error('User not found!');
+    }
+    return user;
   }
 
   async findOne(id: number) {
@@ -36,10 +42,19 @@ export class UsersService {
       select: { password: false, id: true, username: true },
     });
 
+    if (!user) {
+      throw new Error('User not found!');
+    }
+
     return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new Error('User not found!');
+    }
+
     return await this.prismaService.users.update({
       where: { id },
       data: updateUserDto,
@@ -47,6 +62,11 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new Error('User not found!');
+    }
+
     return await this.prismaService.users.delete({ where: { id } });
   }
 }
