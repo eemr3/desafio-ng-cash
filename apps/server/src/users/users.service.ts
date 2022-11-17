@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +12,13 @@ export class UsersService {
     if (userExists) {
       throw new Error('Username already exists!');
     }
-    const user = await this.prismaService.users.create({ data: createUserDto });
+    const data = {
+      ...createUserDto,
+      password: await bcrypt.hash(createUserDto.password, 10),
+    };
+
+    const user = await this.prismaService.users.create({ data });
+
     return user;
   }
 
