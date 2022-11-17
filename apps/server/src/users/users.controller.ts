@@ -9,10 +9,12 @@ import {
   ConflictException,
   NotFoundException,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -27,11 +29,13 @@ export class UsersController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll() {
     return await this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
@@ -41,6 +45,7 @@ export class UsersController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -53,6 +58,7 @@ export class UsersController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     try {
