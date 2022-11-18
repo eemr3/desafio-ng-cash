@@ -3,41 +3,42 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { AccountsService } from 'src/accounts/accounts.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly accouts: AccountsService,
+  ) {}
   async create(createUserDto: CreateUserDto) {
     const userExists = await this.findUserName(createUserDto.username);
     if (userExists) {
       throw new Error('Username already exists!');
     }
+    const account = await this.accouts.create({});
     const data = {
       ...createUserDto,
       password: await bcrypt.hash(createUserDto.password, 10),
+      accountId: account.id,
     };
-
-    const user = await this.prismaService.users.create({ data });
+    const user = await this.prisma.users.create({ data });
 
     return user;
   }
 
   async findAll() {
-    return await this.prismaService.users.findMany();
+    return await this.prisma.users.findMany({ include: { Accounts: true } });
   }
 
   async findUserName(username: string) {
-    const user = await this.prismaService.users.findUnique({
+    return await this.prisma.users.findUnique({
       where: { username },
     });
-    if (!user) {
-      throw new Error('User not found!');
-    }
-    return user;
   }
 
   async findOne(id: number) {
-    const user = await this.prismaService.users.findFirst({
+    const user = await this.prisma.users.findFirst({
       where: { id },
       select: { password: false, id: true, username: true },
     });
@@ -55,7 +56,7 @@ export class UsersService {
       throw new Error('User not found!');
     }
 
-    return await this.prismaService.users.update({
+    return await this.prisma.users.update({
       where: { id },
       data: updateUserDto,
     });
@@ -67,6 +68,6 @@ export class UsersService {
       throw new Error('User not found!');
     }
 
-    return await this.prismaService.users.delete({ where: { id } });
+    return await this.prisma.users.delete({ where: { id } });
   }
 }
