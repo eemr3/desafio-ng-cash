@@ -11,20 +11,25 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly accouts: AccountsService,
   ) {}
+
   async create(createUserDto: CreateUserDto) {
     const userExists = await this.findUserName(createUserDto.username);
     if (userExists) {
       throw new Error('Username already exists!');
     }
-    const account = await this.accouts.create({});
     const data = {
       ...createUserDto,
       password: await bcrypt.hash(createUserDto.password, 10),
-      accountId: account.id,
     };
     const user = await this.prisma.users.create({ data });
+    const account = await this.accouts.create({});
+    const userAccountId = await this.update(user.id, { accountId: account.id });
 
-    return user;
+    return {
+      ...user,
+      password: null,
+      accountId: userAccountId.accountId,
+    };
   }
 
   async findAll() {
@@ -40,7 +45,12 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.prisma.users.findFirst({
       where: { id },
-      select: { password: false, id: true, username: true },
+      select: {
+        password: false,
+        id: true,
+        username: true,
+        Accounts: { select: { id: false, balance: true } },
+      },
     });
 
     if (!user) {

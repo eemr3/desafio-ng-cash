@@ -16,7 +16,7 @@ model Users {
   password  String
   accountId Int?
 
-  Accounts Accounts? @relation(fields: [accountId], references: [id])
+  Accounts Accounts? @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("users")
 }
