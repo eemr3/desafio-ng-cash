@@ -5,6 +5,12 @@ import { UsersService } from 'src/users/users.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 
+export interface IUser {
+  userId: number;
+  username: string;
+  accountId: number;
+}
+
 @Injectable()
 export class TransactionsService {
   constructor(
@@ -13,7 +19,7 @@ export class TransactionsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async create(createTransactionDto: CreateTransactionDto, user) {
+  async create(createTransactionDto: CreateTransactionDto, user: IUser) {
     const userResponse = await this.usersService.findUserName(
       createTransactionDto.username,
     );
@@ -39,12 +45,15 @@ export class TransactionsService {
         value: createTransactionDto.value,
       },
     });
+    const credit = userResponse.balance + createTransactionDto.value;
+    const debit = account.balance - createTransactionDto.value;
+    console.log(credit);
 
-    await this.accountService.update(userResponse.accountId, {
-      balance: account.balance + createTransactionDto.value,
+    await this.accountService.update(userResponse.id, {
+      balance: credit,
     });
     await this.accountService.update(user.userId, {
-      balance: account.balance - createTransactionDto.value,
+      balance: debit,
     });
     return {
       ...transaction,
@@ -55,13 +64,7 @@ export class TransactionsService {
     return this.prisma.transactions.findMany();
   }
 
-  async findOne(user) {
-    // if (id !== user) {
-    //   throw new Error(
-    //     'This account is not allowed to view data from another account!',
-    //   );
-    // }
-
+  async findOne(user: IUser) {
     const transaction = await this.accountService.findTransactionPerAccount(
       user,
     );
