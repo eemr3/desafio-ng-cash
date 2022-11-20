@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
+import { IUser } from 'src/transactions/transactions.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 
@@ -21,11 +22,47 @@ export class AccountsService {
       where: {
         id,
       },
+      include: {
+        users: true,
+      },
     });
 
     return transaction;
   }
-  async findTransactionPerAccount(user) {
+
+  async findUserName(id: number) {
+    const account = await this.prisma.accounts.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    return account.users[0].username;
+  }
+
+  async helpers(arr) {
+    const credFrom = await Promise.all(
+      arr.map(async (item) => {
+        let user;
+        if (item.debitedAccountId) {
+          user = await this.findUserName(item.debitedAccountId);
+        } else {
+          user = await this.findUserName(item.creditedAccountId);
+        }
+        return {
+          id: item.id,
+          value: item.value,
+          transferFrom: user,
+          createdAt: item.createdAt,
+        };
+      }),
+    );
+    return credFrom;
+  }
+  async findTransactionPerAccount(user: IUser) {
     const transaction = await this.prisma.accounts.findMany({
       where: {
         id: user.accountId,
@@ -43,8 +80,8 @@ export class AccountsService {
           select: {
             id: true,
             value: true,
-            creditedAccountId: !null ? true : false,
-            debitedAccountId: !null ? true : false,
+            creditedAccountId: false,
+            debitedAccountId: true,
             createdAt: true,
           },
         },
@@ -52,21 +89,56 @@ export class AccountsService {
           select: {
             id: true,
             value: true,
-            creditedAccountId: !null ? true : false,
-            debitedAccountId: !null ? true : false,
+            creditedAccountId: true,
+            debitedAccountId: false,
             createdAt: true,
           },
         },
       },
     });
 
-    return transaction.map((t) => ({
-      id: t.id,
-      balance: t.balance,
-      user: t.users[0],
-      'cash-in': [...t.transactionCredit],
-      'cash-out': [...t.transactionDebit],
-    }))[0];
+    return transaction.map(async (t) => {
+      return {
+        id: t.id,
+        balance: t.balance,
+        user: t.users[0],
+        'cash-in': await this.helpers(t.transactionCredit),
+        'cash-out': await this.helpers(t.transactionDebit),
+      };
+    })[0];
+  }
+
+  async findAndFilterTransaction(user: IUser, type: { query: string }) {
+    if (type.query === 'credit') {
+      const transactionFilteredCredit = await this.prisma.accounts.findMany({
+        where: { id: user.accountId },
+        include: {
+          transactionCredit: true,
+          transactionDebit: false,
+        },
+      });
+      return transactionFilteredCredit;
+    }
+    return await this.prisma.accounts.findMany({
+      where: { id: user.accountId },
+      include: {
+        transactionCredit: false,
+        transactionDebit: true,
+      },
+    });
+  }
+
+  async findTransactionPerDate(query, user: IUser) {
+    const transactions = await this.prisma.transactions.findMany({
+      where: {
+        id: user.userId,
+        createdAt: {
+          gte: new Date(query.query),
+        },
+      },
+    });
+
+    return transactions;
   }
 
   async update(id: number, updateAccountDto: UpdateAccountDto) {

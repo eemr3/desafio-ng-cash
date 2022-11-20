@@ -9,14 +9,25 @@ import {
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
+export interface RequestWithUserRole extends Request {
+  user?: {
+    userId: number;
+    username: string;
+    accountId: number;
+  };
+}
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  async create(@Body() createTransactionDto: any, @Req() req: any) {
+  async create(
+    @Body() createTransactionDto: any,
+    @Req() req: RequestWithUserRole,
+  ) {
     try {
       return await this.transactionsService.create(
         createTransactionDto,
@@ -35,7 +46,7 @@ export class TransactionsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/user')
-  async findOne(@Req() req: any) {
+  async findOne(@Req() req: RequestWithUserRole) {
     try {
       return await this.transactionsService.findOne(req.user);
     } catch (error) {

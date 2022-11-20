@@ -37,9 +37,22 @@ export class UsersService {
   }
 
   async findUserName(username: string) {
-    return await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: { username },
+      select: {
+        password: true,
+        id: true,
+        username: true,
+        Accounts: { select: { id: true, balance: true } },
+      },
     });
+    return {
+      id: user.id,
+      username: user.username,
+      password: user.password,
+      accountId: user.Accounts.id,
+      balance: user.Accounts.balance,
+    };
   }
 
   async findOne(id: number) {
