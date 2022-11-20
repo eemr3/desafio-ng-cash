@@ -6,8 +6,10 @@ import {
   Param,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { RequestWithUserRole } from 'src/transactions/transactions.controller';
 import { AccountsService } from './accounts.service';
 import { UpdateAccountDto } from './dto/update-account.dto';
 
@@ -31,5 +33,23 @@ export class AccountsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
     return this.accountsService.update(+id, updateAccountDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/filter/transactions')
+  async findAndFilterTransaction(
+    @Query() query,
+    @Req() req: RequestWithUserRole,
+  ) {
+    return await this.accountsService.findAndFilterTransaction(req.user, query);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/filter/transaction/date')
+  async findTransactionPerDate(
+    @Query() query,
+    @Req() req: RequestWithUserRole,
+  ) {
+    return await this.accountsService.findTransactionPerDate(query, req.user);
   }
 }
