@@ -6,6 +6,7 @@ export type LoginData = {
   id: number;
   username: string;
   password: string;
+  accountId: number;
 };
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       username: user.username,
+      accountId: user.accountId,
     };
     return {
       token: this.jwtService.sign(payload),

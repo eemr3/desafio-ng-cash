@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { AccountsService } from 'src/accounts/accounts.service';
 import { PrismaService } from 'src/prisma.service';
 import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
@@ -17,6 +18,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     JwtStrategy,
     UsersService,
     PrismaService,
+    AccountsService,
   ],
   imports: [
     JwtModule.register({
