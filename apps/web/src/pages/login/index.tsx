@@ -1,20 +1,30 @@
-import { LockClosedIcon } from '@heroicons/react/20/solid';
+import { useContext } from 'react';
+import Router from 'next/router';
 import Link from 'next/link';
 import { useFormik } from 'formik';
+import { LockClosedIcon } from '@heroicons/react/20/solid';
 import { ToastContainer, toast } from 'react-toastify';
 import { CustomInput } from '../../components/CustomInput';
 import { CustomPasswordInput } from '../../components/CustomPasswordInput';
 import { schema } from './schema';
+import { AuthContext } from '../../context/AuthProvider';
 
 export default function Login() {
+  const { signIn, user } = useContext(AuthContext);
+
   const formik = useFormik({
     initialValues: {
       username: '',
       password: '',
     },
     validationSchema: schema,
-    onSubmit: () => {
-      console.log(formik.values);
+    onSubmit: async () => {
+      try {
+        await signIn(formik.values);
+        Router.push('/dashboard');
+      } catch (error) {
+        toast.error((error as any).response.data.message);
+      }
     },
   });
 
