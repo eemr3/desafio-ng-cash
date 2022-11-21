@@ -1,6 +1,7 @@
 import { LockClosedIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import { useFormik } from 'formik';
+import { ToastContainer, toast } from 'react-toastify';
 import { CustomInput } from '../../components/CustomInput';
 import { CustomPasswordInput } from '../../components/CustomPasswordInput';
 import { schema } from './schema';
@@ -16,8 +17,10 @@ export default function Login() {
       console.log(formik.values);
     },
   });
+
   return (
     <>
+      <ToastContainer />
       <div
         className="flex min-h-full items-center justify-center py-12 px-4 
           sm:px-6 lg:px-8 h-screen"
@@ -38,34 +41,42 @@ export default function Login() {
             method="POST"
           >
             <div className="-space-y-px rounded-md shadow-sm">
-              <CustomInput
-                label="Nome de usuário"
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
-                required
-                value={formik.values.username}
-                onChange={formik.handleChange}
-                className="relative block w-full appearance-none rounded-none 
+              <div className="mb-4">
+                <CustomInput
+                  label="Nome de usuário"
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  value={formik.values.username}
+                  onChange={formik.handleChange}
+                  className="relative block w-full appearance-none rounded-none 
                   rounded-t-md border border-gray-300 px-3 py-2 text-gray-900
                   placeholder-gray-500 focus:z-10 focus:border-indigo-500 
                   focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="Nome de usuário"
-              />
-              {formik.errors.username && <p>{formik.errors.username}</p>}
-              <CustomPasswordInput
-                label="Senha"
-                id="password"
-                name="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                className="relative block w-full appearance-none rounded-none 
+                  placeholder="Nome de usuário"
+                />
+                {formik.errors.username && (
+                  <p className="text-red-500">{formik.errors.username}</p>
+                )}
+              </div>
+              <div className="mb-4">
+                <CustomPasswordInput
+                  label="Senha"
+                  id="password"
+                  name="password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  className="relative block w-full appearance-none rounded-none 
                 rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 
                 placeholder-gray-500 focus:z-10 focus:border-indigo-500 
                 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              />
-              {formik.errors.password && <p>{formik.errors.password}</p>}
+                />
+                {formik.errors.password && (
+                  <p className="text-red-500">{formik.errors.password}</p>
+                )}
+              </div>
             </div>
 
             <div className="mt-4">

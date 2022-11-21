@@ -7,7 +7,7 @@ interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const CustomInput: FC<IInputProps> = ({ id, label, ...rest }) => {
   return (
-    <div className="mb-4">
+    <div>
       <label htmlFor={id} className="sr-only">
         {label}
       </label>

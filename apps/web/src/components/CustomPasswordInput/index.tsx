@@ -13,7 +13,7 @@ export const CustomPasswordInput: FC<InputProps> = ({ id, label, ...rest }) => {
   };
 
   return (
-    <div className="mb-4">
+    <div>
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
