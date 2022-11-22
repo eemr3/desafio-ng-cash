@@ -24,7 +24,6 @@ export const CustomPasswordInput: FC<InputProps> = ({ id, label, ...rest }) => {
           id={id}
           type={showPassword ? 'text' : 'password'}
           autoComplete="current-password"
-          required
         />
         {showPassword ? (
           <IoEyeOutline

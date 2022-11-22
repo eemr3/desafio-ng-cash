@@ -33,7 +33,7 @@ export class TransactionsService {
       Number(Number(account.balance) < createTransactionDto.value) ||
       Number(account.balance) <= 0
     ) {
-      throw new Error(' Insufficient balance to carry out the transaction');
+      throw new Error('Insufficient balance to carry out the transaction');
     }
 
     const transaction = await this.prisma.transactions.create({

@@ -49,15 +49,23 @@ export class AccountsService {
         let user;
         if (item.debitedAccountId) {
           user = await this.findUserName(item.debitedAccountId);
+          return {
+            id: item.id,
+            value: item.value,
+            transfer: user,
+            createdAt: item.createdAt,
+            type: 'C',
+          };
         } else {
           user = await this.findUserName(item.creditedAccountId);
+          return {
+            id: item.id,
+            value: item.value,
+            transfer: user,
+            createdAt: item.createdAt,
+            type: 'D',
+          };
         }
-        return {
-          id: item.id,
-          value: item.value,
-          transferFrom: user,
-          createdAt: item.createdAt,
-        };
       }),
     );
     return credFrom;
