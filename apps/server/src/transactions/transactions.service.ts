@@ -26,9 +26,7 @@ export class TransactionsService {
     const account = await this.accountService.findOne(user.userId);
 
     if (user.userId === userResponse.id) {
-      throw new Error(
-        'It is not possible to make a transfer to the same account!',
-      );
+      throw new Error('Forbidden');
     }
 
     if (

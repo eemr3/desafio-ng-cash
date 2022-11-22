@@ -6,10 +6,12 @@ import {
   Req,
   UseGuards,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { ErrorHandler } from '@nestjs/common/interfaces';
 
 export interface RequestWithUserRole extends Request {
   user?: {
@@ -34,7 +36,12 @@ export class TransactionsController {
         req.user,
       );
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      if (error.message === 'Forbidden') {
+        const message =
+          'It is not possible to make a transfer to the same account!';
+        throw new ForbiddenException(message);
+      }
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -47,10 +54,6 @@ export class TransactionsController {
   @UseGuards(AuthGuard('jwt'))
   @Get('/user')
   async findOne(@Req() req: RequestWithUserRole) {
-    try {
-      return await this.transactionsService.findOne(req.user);
-    } catch (error) {
-      throw new ForbiddenException(error.message);
-    }
+    return await this.transactionsService.findOne(req.user);
   }
 }
