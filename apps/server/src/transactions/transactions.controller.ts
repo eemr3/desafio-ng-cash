@@ -11,7 +11,6 @@ import {
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { ErrorHandler } from '@nestjs/common/interfaces';
 
 export interface RequestWithUserRole extends Request {
   user?: {
