@@ -6,6 +6,9 @@ module.exports = {
       width: {
         content: 'min(90vw, 800px)',
       },
+      colors: {
+        modal: 'rgba(0, 0, 0, 0.7)',
+      },
     },
   },
   plugins: [],

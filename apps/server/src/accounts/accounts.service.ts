@@ -117,36 +117,111 @@ export class AccountsService {
   }
 
   async findAndFilterTransaction(user: IUser, type: { query: string }) {
-    if (type.query === 'credit') {
-      const transactionFilteredCredit = await this.prisma.accounts.findMany({
-        where: { id: user.accountId },
-        include: {
-          transactionCredit: true,
-          transactionDebit: false,
-        },
-      });
-      return transactionFilteredCredit;
-    }
-    return await this.prisma.accounts.findMany({
+    const transactionFiltered = await this.prisma.accounts.findMany({
       where: { id: user.accountId },
       include: {
-        transactionCredit: false,
-        transactionDebit: true,
+        users: {
+          select: {
+            id: true,
+            username: true,
+            password: false,
+            accountId: false,
+          },
+        },
+        transactionCredit: {
+          select: {
+            id: true,
+            value: true,
+            creditedAccountId: false,
+            debitedAccountId: true,
+            createdAt: true,
+          },
+        },
+        transactionDebit: {
+          select: {
+            id: true,
+            value: true,
+            creditedAccountId: true,
+            debitedAccountId: false,
+            createdAt: true,
+          },
+        },
       },
     });
+    if (type.query === 'cash-in') {
+      return transactionFiltered.map(async (t) => {
+        return {
+          id: t.id,
+          balance: t.balance,
+          user: t.users[0],
+          'cash-in': await this.helpers(t.transactionCredit),
+        };
+      })[0];
+    }
+    return transactionFiltered.map(async (t) => {
+      return {
+        id: t.id,
+        balance: t.balance,
+        user: t.users[0],
+        'cash-out': await this.helpers(t.transactionDebit),
+      };
+    })[0];
   }
 
   async findTransactionPerDate(query, user: IUser) {
-    const transactions = await this.prisma.transactions.findMany({
+    const transactions = await this.prisma.accounts.findMany({
       where: {
-        id: user.userId,
-        createdAt: {
-          gte: new Date(query.query),
+        id: user.accountId,
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            username: true,
+            password: false,
+            accountId: false,
+          },
+        },
+        transactionCredit: {
+          where: {
+            createdAt: {
+              gte: new Date(query.query),
+            },
+          },
+          select: {
+            id: true,
+            value: true,
+            creditedAccountId: false,
+            debitedAccountId: true,
+            createdAt: true,
+          },
+        },
+        transactionDebit: {
+          where: {
+            createdAt: {
+              gte: new Date(query.query),
+            },
+          },
+          select: {
+            id: true,
+            value: true,
+            creditedAccountId: true,
+            debitedAccountId: false,
+            createdAt: true,
+          },
         },
       },
     });
 
-    return transactions;
+    return transactions.map(async (t) => {
+      return {
+        id: t.id,
+        balance: t.balance,
+        user: t.users[0],
+        'cash-in': await this.helpers(t.transactionCredit),
+        'cash-out': await this.helpers(t.transactionDebit),
+      };
+    })[0];
   }
 
   async update(id: number, updateAccountDto: UpdateAccountDto) {
