@@ -1,4 +1,9 @@
+import { useFormik } from 'formik';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/AuthProvider';
+import { createNewTransatcion } from '../../server/requests';
 import { CustomInput } from '../CustomInput';
+import { schema } from './schema';
 
 type ModalProps = {
   isOpen: boolean;
@@ -6,6 +11,23 @@ type ModalProps = {
 };
 
 export function Modal({ isOpen, closeModal }: ModalProps) {
+  const { setIsSuccess, isSuccess } = useContext(AuthContext);
+  const formik = useFormik({
+    initialValues: {
+      username: '',
+      value: 0,
+    },
+    validationSchema: schema,
+    onSubmit: async () => {
+      try {
+        await createNewTransatcion(formik.values);
+        setIsSuccess(!isSuccess);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  });
+
   return isOpen ? (
     <div
       className="w-full h-full bg-modal 
@@ -16,22 +38,31 @@ export function Modal({ isOpen, closeModal }: ModalProps) {
         <div>
           <div className="max-[500px]">
             <h2 className="mt-0">Nova Transaçãp</h2>
-            <form action="">
+            <form onSubmit={formik.handleSubmit}>
               <div className="mt-[0.8rem]">
                 <CustomInput
                   label="Nome do usuário"
                   id="username"
+                  name="username"
+                  value={formik.values.username}
+                  onChange={formik.handleChange}
                   placeholder="Nome do usuário"
                   className="relative block w-full appearance-none rounded-none 
                   rounded-t-md border border-gray-300 px-3 py-2 text-gray-900
                   placeholder-gray-500 focus:z-10 focus:border-indigo-500 
                   focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 />
+                {formik.errors.username && (
+                  <p className="text-[#e92929]">{formik.errors.username}</p>
+                )}
               </div>
               <div className="mt-[0.8rem]">
                 <CustomInput
                   label="Valor da transação"
                   id="value"
+                  name="value"
+                  value={formik.values.value}
+                  onChange={formik.handleChange}
                   placeholder="0,00"
                   type="number"
                   className="relative block w-full appearance-none rounded-none 
@@ -39,6 +70,9 @@ export function Modal({ isOpen, closeModal }: ModalProps) {
                   placeholder-gray-500 focus:z-10 focus:border-indigo-500 
                   focus:outline-none focus:ring-indigo-500 sm:text-sm"
                 />
+                {formik.errors.value && (
+                  <p className="text-[#e92929]">{formik.errors.value}</p>
+                )}
               </div>
               <div className="mt-4 flex justify-between items-center">
                 <button
@@ -49,7 +83,10 @@ export function Modal({ isOpen, closeModal }: ModalProps) {
                 >
                   Cancelar
                 </button>
-                <button className="w-[48%] h-[50px] text-white bg-[#49aa26] rounded hover:bg-[#3dd705]">
+                <button
+                  type="submit"
+                  className="w-[48%] h-[50px] text-white bg-[#49aa26] rounded hover:bg-[#3dd705]"
+                >
                   Salvar
                 </button>
               </div>
