@@ -44,12 +44,7 @@ export default function Login() {
               Faça login em sua conta
             </h2>
           </div>
-          <form
-            onSubmit={formik.handleSubmit}
-            className="mt-8 space-y-6"
-            action="#"
-            method="POST"
-          >
+          <form onSubmit={formik.handleSubmit} className="mt-8 space-y-6" method="POST">
             <div className="-space-y-px rounded-md shadow-sm">
               <div className="mb-4">
                 <CustomInput

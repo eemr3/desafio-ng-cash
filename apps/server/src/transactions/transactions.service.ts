@@ -26,16 +26,14 @@ export class TransactionsService {
     const account = await this.accountService.findOne(user.userId);
 
     if (user.userId === userResponse.id) {
-      throw new Error(
-        'It is not possible to make a transfer to the same account!',
-      );
+      throw new Error('Forbidden');
     }
 
     if (
       Number(Number(account.balance) < createTransactionDto.value) ||
       Number(account.balance) <= 0
     ) {
-      throw new Error(' Insufficient balance to carry out the transaction');
+      throw new Error('Insufficient balance to carry out the transaction');
     }
 
     const transaction = await this.prisma.transactions.create({

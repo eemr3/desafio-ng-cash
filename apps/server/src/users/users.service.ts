@@ -14,6 +14,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const userExists = await this.findUserName(createUserDto.username);
+
     if (userExists) {
       throw new Error('Username already exists!');
     }
@@ -46,6 +47,9 @@ export class UsersService {
         Accounts: { select: { id: true, balance: true } },
       },
     });
+    if (!user) {
+      return null;
+    }
     return {
       id: user.id,
       username: user.username,
