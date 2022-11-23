@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useState } from 'react';
+import Router from 'next/router';
 import { api } from '../server/http';
 import Cookies from 'js-cookie';
-
 interface IContext {
   signIn: (data: IUser) => Promise<void>;
   user: string | null;
@@ -31,6 +31,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = () => {
     Cookies.remove('authToken');
     setUser(null);
+    Router.push('/login');
   };
 
   return (

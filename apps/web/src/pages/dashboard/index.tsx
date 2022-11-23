@@ -1,8 +1,9 @@
 import { RequestContext } from 'next/dist/server/base-server';
-import { IoExitOutline } from 'react-icons/io5';
+import { IoAddOutline, IoExitOutline } from 'react-icons/io5';
 import Image from 'next/image';
 import { api } from '../../server/http';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../context/AuthProvider';
 
 type Trasaction = {
   id: number;
@@ -13,6 +14,7 @@ type Trasaction = {
 };
 
 export default function Dashboard({ data }: any) {
+  const { signOut } = useContext(AuthContext);
   const [transaction, setTransaction] = useState<Trasaction[] | null>(null);
   useEffect(() => {
     setTransaction([...data['cash-in'], ...data['cash-out']]);
@@ -24,7 +26,7 @@ export default function Dashboard({ data }: any) {
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-screen bg-[#f0f2f5]">
       <header
         className="w-[100%] bg-[#2d4a22] pt-10 pb-36 h-[300px] flex flex-col items-center
            justify-between relative"
@@ -38,9 +40,12 @@ export default function Dashboard({ data }: any) {
         />
         <h2 className="text-white mt-2 text-lg">
           Que bom te ver novamente{' '}
-          <span className="text-[#49aa26]">{data.user.username}</span> :)
+          <span className="text-[#49aa26] font-semibold">{data.user.username}</span> :)
         </h2>
-        <button className="absolute flex items-center top-8 right-4 md:right-24 text-white">
+        <button
+          onClick={signOut}
+          className="absolute flex items-center top-8 right-4 md:right-24 text-white"
+        >
           <IoExitOutline className="mr-1 text-[1.4rem]" />
           Sair
         </button>
@@ -61,34 +66,40 @@ export default function Dashboard({ data }: any) {
           </div>
         </section>
         <section className="block w-full overflow-x-auto">
-          <h2 className="sr-only">Transaçoes</h2>
-          <button className="button new">+ Nova transação</button>
-          <table className="w-full border-spacing-y-[0.5rem] text-[#969cbc]">
+          <button className="text-[#49aa26] hover:text-[#3dd705] text-lg flex items-center">
+            <IoAddOutline className="mr-1 text-[1.3rem]" /> Nova transação
+          </button>
+          <table className="w-full text-[#969cbc] border-spacing-y-2 border-separate">
             <thead>
               <tr>
-                <th className="rounded-t rounded-bl">Histórico</th>
-                <th>Usuário</th>
-                <th>Valor</th>
-                <th>Data</th>
-                <th></th>
+                <th className="py-4 px-8 text-left first-letter:first:rounded-l">
+                  Histórico
+                </th>
+                <th className="py-4 px-8 text-left">Usuário</th>
+                <th className="py-4 px-8 text-left">Valor</th>
+                <th className="py-4 px-8 text-left">Data</th>
               </tr>
             </thead>
             <tbody>
               {transaction?.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.type}</td>
-                  <td>{item.transfer}</td>
+                <tr key={item.id} className="opacity-70 hover:opacity-100">
+                  <td className="bg-white py-4 px-8 text-[#363f5f] first:rounded-l">
+                    {item.type}
+                  </td>
+                  <td className="bg-white py-4 px-8 text-[#363f5f]">{item.transfer}</td>
                   <td
-                    className={`${
+                    className={`bg-white ${
                       item.type === 'C' ? 'text-[#49aa26]' : 'text-[#e92929]'
-                    }`}
+                    } py-4 px-8`}
                   >
                     {Number(item.value).toLocaleString('pt-BR', {
                       style: 'currency',
                       currency: 'BRL',
                     })}
                   </td>
-                  <td>{formatDate(item.createdAt)}</td>
+                  <td className="bg-white py-4 px-8 text-[#363f5f]">
+                    {formatDate(item.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>
