@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { api } from '../../server/http';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthProvider';
+import { Modal } from '../../components/Modal';
 
 type Trasaction = {
   id: number;
@@ -14,6 +15,16 @@ type Trasaction = {
 };
 
 export default function Dashboard({ data }: any) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
   const { signOut } = useContext(AuthContext);
   const [transaction, setTransaction] = useState<Trasaction[] | null>(null);
   useEffect(() => {
@@ -27,6 +38,7 @@ export default function Dashboard({ data }: any) {
 
   return (
     <div className="w-full h-screen bg-[#f0f2f5]">
+      <Modal closeModal={closeModal} isOpen={isOpen} />
       <header
         className="w-[100%] bg-[#2d4a22] pt-10 pb-36 h-[300px] flex flex-col items-center
            justify-between relative"
@@ -66,7 +78,10 @@ export default function Dashboard({ data }: any) {
           </div>
         </section>
         <section className="block w-full overflow-x-auto">
-          <button className="text-[#49aa26] hover:text-[#3dd705] text-lg flex items-center">
+          <button
+            onClick={openModal}
+            className="text-[#49aa26] hover:text-[#3dd705] text-lg flex items-center"
+          >
             <IoAddOutline className="mr-1 text-[1.3rem]" /> Nova transação
           </button>
           <table className="w-full text-[#969cbc] border-spacing-y-2 border-separate">
