@@ -13,5 +13,6 @@ import { UsersService } from 'src/users/users.service';
     AccountsService,
     UsersService,
   ],
+  exports: [TransactionsModule],
 })
 export class TransactionsModule {}

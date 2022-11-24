@@ -12,6 +12,8 @@ import {
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 
 export interface RequestWithUserRole extends Request {
   user?: {
@@ -21,13 +23,15 @@ export interface RequestWithUserRole extends Request {
   };
 }
 @Controller('transactions')
+@ApiTags('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
+  @ApiResponse({ status: 201 })
   async create(
-    @Body() createTransactionDto: any,
+    @Body() createTransactionDto: CreateTransactionDto | undefined,
     @Req() req: RequestWithUserRole,
   ) {
     try {
@@ -49,11 +53,11 @@ export class TransactionsController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get()
-  async findAll() {
-    return await this.transactionsService.findAll();
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Get()
+  // async findAll() {
+  //   return await this.transactionsService.findAll();
+  // }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/user')
