@@ -7,6 +7,7 @@ import {
   UseGuards,
   ForbiddenException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -39,6 +40,10 @@ export class TransactionsController {
         const message =
           'It is not possible to make a transfer to the same account!';
         throw new ForbiddenException(message);
+      }
+      if (error.message === 'NotFound') {
+        const message = 'User not found!';
+        throw new NotFoundException(message);
       }
       throw new BadRequestException(error.message);
     }

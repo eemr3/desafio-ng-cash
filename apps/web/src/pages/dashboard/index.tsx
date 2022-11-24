@@ -95,6 +95,6 @@ export async function getServerSideProps(ctx: RequestContext) {
     const transactions = [...data['cash-in'], ...data['cash-out']];
     return { props: { transactions, data } };
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }
