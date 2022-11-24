@@ -13,7 +13,7 @@ export const createNewTransatcion = async (data: { username: string; value: numb
       Authorization: `Bearer ${token}`,
     },
   });
-  return response.data;
+  return response;
 };
 
 export const getTransectionFitered = async (type: string, query: string) => {

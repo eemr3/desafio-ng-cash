@@ -43,10 +43,10 @@ export class AccountsService {
     return account.users[0].username;
   }
 
-  async helpers(arr) {
+  async helpers(arr: any) {
     const credFrom = await Promise.all(
-      arr.map(async (item) => {
-        let user;
+      arr.map(async (item: any) => {
+        let user: any;
         if (item.debitedAccountId) {
           user = await this.findUserName(item.debitedAccountId);
           return {
@@ -70,6 +70,7 @@ export class AccountsService {
     );
     return credFrom;
   }
+
   async findTransactionPerAccount(user: IUser) {
     const transaction = await this.prisma.accounts.findMany({
       where: {

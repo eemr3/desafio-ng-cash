@@ -45,7 +45,6 @@ export class TransactionsService {
     });
     const credit = userResponse.balance + createTransactionDto.value;
     const debit = account.balance - createTransactionDto.value;
-    console.log(credit);
 
     await this.accountService.update(userResponse.id, {
       balance: credit,

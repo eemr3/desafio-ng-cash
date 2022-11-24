@@ -8,20 +8,26 @@ import { schema } from './schema';
 type ModalProps = {
   isOpen: boolean;
   closeModal: () => void;
+  refreshData: () => void;
 };
 
-export function Modal({ isOpen, closeModal }: ModalProps) {
-  const { setIsSuccess, isSuccess } = useContext(AuthContext);
+export function Modal({ isOpen, closeModal, refreshData }: ModalProps) {
   const formik = useFormik({
     initialValues: {
       username: '',
       value: 0,
     },
     validationSchema: schema,
-    onSubmit: async () => {
+    onSubmit: async (values, actions) => {
       try {
-        await createNewTransatcion(formik.values);
-        setIsSuccess(!isSuccess);
+        const response = await createNewTransatcion(values);
+        if (response.status < 300 && response.status >= 200) {
+          refreshData();
+        }
+        console.log(values);
+
+        actions.resetForm();
+        closeModal();
       } catch (error) {
         console.log(error);
       }
