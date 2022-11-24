@@ -15,6 +15,7 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('NG.Transfer')
     .setDescription('API de transações financeiras entre contas da plataforma.')
     .setVersion('1.0')

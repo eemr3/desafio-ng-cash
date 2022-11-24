@@ -12,8 +12,19 @@ import {
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { getReponse, successCreated } from './swagger/response';
+import { exceptionError } from 'src/users/swagger/success.response';
 
 export interface RequestWithUserRole extends Request {
   user?: {
@@ -23,13 +34,27 @@ export interface RequestWithUserRole extends Request {
   };
 }
 @Controller('transactions')
+@ApiBearerAuth()
 @ApiTags('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
+  @ApiCreatedResponse({ type: successCreated })
+  @ApiForbiddenResponse({
+    description: 'It is not possible to make a transfer to the same account!',
+    type: exceptionError,
+  })
+  @ApiNotFoundResponse({ description: 'User not found!', type: exceptionError })
+  @ApiBadRequestResponse({
+    description: 'Insufficient balance to carry out the transactio',
+    type: exceptionError,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+    type: exceptionError,
+  })
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  @ApiResponse({ status: 201 })
   async create(
     @Body() createTransactionDto: CreateTransactionDto | undefined,
     @Req() req: RequestWithUserRole,
@@ -53,12 +78,11 @@ export class TransactionsController {
     }
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @Get()
-  // async findAll() {
-  //   return await this.transactionsService.findAll();
-  // }
-
+  @ApiOkResponse({ type: getReponse })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+    type: exceptionError,
+  })
   @UseGuards(AuthGuard('jwt'))
   @Get('/user')
   async findOne(@Req() req: RequestWithUserRole) {
