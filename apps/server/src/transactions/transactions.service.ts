@@ -25,6 +25,10 @@ export class TransactionsService {
     );
     const account = await this.accountService.findOne(user.userId);
 
+    if (!userResponse) {
+      throw new Error('NotFound');
+    }
+
     if (user.userId === userResponse.id) {
       throw new Error('Forbidden');
     }
