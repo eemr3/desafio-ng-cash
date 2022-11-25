@@ -1,0 +1,1 @@
+Pasta criada para contornar um problema no container, o mesmo não gera a pasta dist.

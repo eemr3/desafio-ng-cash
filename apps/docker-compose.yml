@@ -25,7 +25,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:12345678@db:5432/ng_cash?schema=public
     volumes:
-      - .:/usr/src/app
+      - .:/usr/app
     command: npm run start:dev
     ports:
       - 3001:3001
