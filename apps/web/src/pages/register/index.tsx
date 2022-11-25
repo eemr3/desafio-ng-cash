@@ -5,8 +5,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import { CustomInput } from '../../components/CustomInput';
 import { CustomPasswordInput } from '../../components/CustomPasswordInput';
 import { responseErrorStatusCode } from '../../helpers/httpStatusCode';
+import { registerSchema } from '../../helpers/yupSchemas';
 import { registerUser } from '../../server/requests';
-import { schema } from './schema';
 
 export default function Register() {
   const formik = useFormik({
@@ -15,7 +15,7 @@ export default function Register() {
       password: '',
       confirmPassword: '',
     },
-    validationSchema: schema,
+    validationSchema: registerSchema,
     onSubmit: async () => {
       try {
         await registerUser({

@@ -1,0 +1,23 @@
+{
+  "name": "ng-cash",
+  "version": "1.0.0",
+  "description": "Aplicação de transação financeira entre contas da plataforma",
+  "main": "index.js",
+  "scripts": {
+    "database": "cd apps && cd server && npx prisma migrate dev --name init",
+    "postinstall": "npm run install:apps",
+    "install:apps": "./apps_install.sh",
+    "compose:up": "(cd apps && docker-compose up -d --build)",
+    "compose:down": "(cd apps && docker-compose down --remove-orphans)"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eemr3/desafio-ng-cash.git"
+  },
+  "author": "Emerson Moreira",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eemr3/desafio-ng-cash/issues"
+  },
+  "homepage": "https://github.com/eemr3/desafio-ng-cash#readme"
+}
