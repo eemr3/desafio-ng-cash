@@ -66,7 +66,8 @@ E renomei o arquivo
 ```
 
 Subir containers
-Volte para a pasta `desafio-ng-cash` e rode o comando abaixo
+
+- Volte para a pasta `desafio-ng-cash` e rode o comando abaixo
 
 ```bash
 npm run compose:up
