@@ -1,7 +1,6 @@
 import { useFormik } from 'formik';
-import { useContext } from 'react';
+import { useRouter } from 'next/router';
 import { toast, ToastContainer } from 'react-toastify';
-import { AuthContext } from '../../context/AuthProvider';
 import { responseErrorStatusCode } from '../../helpers/httpStatusCode';
 import { createNewTransatcion } from '../../server/requests';
 import { CustomInput } from '../CustomInput';
@@ -14,6 +13,7 @@ type ModalProps = {
 };
 
 export function Modal({ isOpen, closeModal, refreshData }: ModalProps) {
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -29,6 +29,10 @@ export function Modal({ isOpen, closeModal, refreshData }: ModalProps) {
         actions.resetForm();
         closeModal();
       } catch (error) {
+        if ((error as any).response.status === 401) {
+          toast.error(responseErrorStatusCode(401));
+          return router.push('/login');
+        }
         if ((error as any).response.status === 403) {
           return toast.error(responseErrorStatusCode(403));
         }

@@ -12,6 +12,7 @@ import Link from 'next/link';
 import Header from '../../components/Header';
 import { TransactionProps } from '../../context/interfaces';
 import { isTokenExpired } from '../../helpers/auth';
+import { AxiosError } from 'axios';
 
 export default function Dashboard({ data }: TransactionProps) {
   const router = useRouter();
@@ -95,6 +96,13 @@ export async function getServerSideProps(ctx: RequestContext) {
     const transactions = [...data['cash-in'], ...data['cash-out']];
     return { props: { transactions, data } };
   } catch (error) {
-    throw error;
+    if ((error as AxiosError).response?.status === 401) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/login',
+        },
+      };
+    }
   }
 }

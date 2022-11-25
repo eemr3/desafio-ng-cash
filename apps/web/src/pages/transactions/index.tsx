@@ -1,6 +1,6 @@
+import { AxiosError } from 'axios';
 import { RequestContext } from 'next/dist/server/base-server';
 import React, { FormEvent, useEffect, useState } from 'react';
-import { idText } from 'typescript';
 import Header from '../../components/Header';
 import { isTokenExpired } from '../../helpers/auth';
 import { api } from '../../server/http';
@@ -234,6 +234,13 @@ export async function getServerSideProps(ctx: RequestContext) {
     const transactions = [...data['cash-in'], ...data['cash-out']];
     return { props: { transactions, data } };
   } catch (error) {
-    console.log(error);
+    if ((error as AxiosError).response?.status === 401) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/login',
+        },
+      };
+    }
   }
 }

@@ -54,7 +54,6 @@ export default function Login() {
                   name="username"
                   type="text"
                   autoComplete="username"
-                  required
                   value={formik.values.username}
                   onChange={formik.handleChange}
                   className="relative block w-full appearance-none rounded-none 
