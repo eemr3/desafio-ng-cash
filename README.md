@@ -66,6 +66,7 @@ E renomei o arquivo
 ```
 
 Subir containers
+Volte para a pasta `desafio-ng-cash` e rode o comando abaixo
 
 ```bash
 npm run compose:up
@@ -75,6 +76,12 @@ Criar banco de dados
 
 ```bash
 npm run database
+```
+
+A aplicação roda na porta:
+
+```bash
+http://localhost:3000
 ```
 
 ##### Registros
