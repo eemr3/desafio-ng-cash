@@ -6,8 +6,9 @@ import { LockClosedIcon } from '@heroicons/react/20/solid';
 import { ToastContainer, toast } from 'react-toastify';
 import { CustomInput } from '../../components/CustomInput';
 import { CustomPasswordInput } from '../../components/CustomPasswordInput';
-import { schema } from './schema';
+
 import { AuthContext } from '../../context/AuthProvider';
+import { loginSchema } from '../../helpers/yupSchemas';
 
 export default function Login() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function Login() {
       username: '',
       password: '',
     },
-    validationSchema: schema,
+    validationSchema: loginSchema,
     onSubmit: async () => {
       try {
         await signIn(formik.values);

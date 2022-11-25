@@ -223,24 +223,13 @@ export async function getServerSideProps(ctx: RequestContext) {
     };
   }
 
-  try {
-    const res = await api.get('/transactions/user', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const res = await api.get('/transactions/user', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    const data = res.data;
-    const transactions = [...data['cash-in'], ...data['cash-out']];
-    return { props: { transactions, data } };
-  } catch (error) {
-    if ((error as AxiosError).response?.status === 401) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: '/login',
-        },
-      };
-    }
-  }
+  const data = res.data;
+  const transactions = [...data['cash-in'], ...data['cash-out']];
+  return { props: { transactions, data } };
 }

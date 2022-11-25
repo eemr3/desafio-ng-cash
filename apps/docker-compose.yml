@@ -1,0 +1,50 @@
+version: '3.89'
+
+services:
+  frontend:
+    container_name: ng_web
+    build:
+      context: ./web
+    command: dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    depends_on:
+      - backend
+  backend:
+    container_name: ng_api
+    build:
+      dockerfile: Dockerfile
+      context: ./server
+      target: development
+    env_file:
+      - ./server/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:12345678@db:5432/ng_cash?schema=public
+    volumes:
+      - .:/usr/src/app
+    command: npm run start:dev
+    ports:
+      - 3001:3001
+    depends_on:
+      - db
+  db:
+    container_name: ng_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: 'ng_cash'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '12345678'
+    ports:
+      - 5432:5432
+    volumes:
+      - ng_cash:/var/lib/postgresql/data
+networks:
+  default:
+    name: ng_net
+volumes:
+  ng_cash:

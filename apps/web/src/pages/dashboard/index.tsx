@@ -1,18 +1,16 @@
 import { RequestContext } from 'next/dist/server/base-server';
-import { IoAddOutline, IoExitOutline, IoListCircleOutline } from 'react-icons/io5';
+import Image from 'next/image';
+import { useState } from 'react';
 import { BsCash } from 'react-icons/bs';
 import { GrTransaction } from 'react-icons/gr';
-import Image from 'next/image';
 import { api } from '../../server/http';
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../context/AuthProvider';
-import { Modal } from '../../components/Modal';
-import Router, { useRouter } from 'next/router';
+import { AxiosError } from 'axios';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Header from '../../components/Header';
+import { Modal } from '../../components/Modal';
 import { TransactionProps } from '../../context/interfaces';
 import { isTokenExpired } from '../../helpers/auth';
-import { AxiosError } from 'axios';
 
 export default function Dashboard({ data }: TransactionProps) {
   const router = useRouter();
@@ -85,24 +83,12 @@ export async function getServerSideProps(ctx: RequestContext) {
     };
   }
 
-  try {
-    const res = await api.get('/transactions/user', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = res.data;
-    const transactions = [...data['cash-in'], ...data['cash-out']];
-    return { props: { transactions, data } };
-  } catch (error) {
-    if ((error as AxiosError).response?.status === 401) {
-      return {
-        redirect: {
-          permanent: false,
-          destination: '/login',
-        },
-      };
-    }
-  }
+  const res = await api.get('/transactions/user', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = res.data;
+  const transactions = [...data['cash-in'], ...data['cash-out']];
+  return { props: { transactions, data } };
 }
