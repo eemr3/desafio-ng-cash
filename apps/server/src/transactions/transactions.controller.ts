@@ -7,10 +7,24 @@ import {
   UseGuards,
   ForbiddenException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { getReponse, successCreated } from './swagger/response';
+import { exceptionError } from 'src/users/swagger/success.response';
 
 export interface RequestWithUserRole extends Request {
   user?: {
@@ -20,13 +34,29 @@ export interface RequestWithUserRole extends Request {
   };
 }
 @Controller('transactions')
+@ApiBearerAuth()
+@ApiTags('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
+  @ApiCreatedResponse({ type: successCreated })
+  @ApiForbiddenResponse({
+    description: 'It is not possible to make a transfer to the same account!',
+    type: exceptionError,
+  })
+  @ApiNotFoundResponse({ description: 'User not found!', type: exceptionError })
+  @ApiBadRequestResponse({
+    description: 'Insufficient balance to carry out the transactio',
+    type: exceptionError,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+    type: exceptionError,
+  })
   @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(
-    @Body() createTransactionDto: any,
+    @Body() createTransactionDto: CreateTransactionDto | undefined,
     @Req() req: RequestWithUserRole,
   ) {
     try {
@@ -40,16 +70,19 @@ export class TransactionsController {
           'It is not possible to make a transfer to the same account!';
         throw new ForbiddenException(message);
       }
+      if (error.message === 'NotFound') {
+        const message = 'User not found!';
+        throw new NotFoundException(message);
+      }
       throw new BadRequestException(error.message);
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get()
-  async findAll() {
-    return await this.transactionsService.findAll();
-  }
-
+  @ApiOkResponse({ type: getReponse })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
+    type: exceptionError,
+  })
   @UseGuards(AuthGuard('jwt'))
   @Get('/user')
   async findOne(@Req() req: RequestWithUserRole) {

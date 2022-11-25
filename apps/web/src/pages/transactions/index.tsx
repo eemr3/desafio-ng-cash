@@ -2,6 +2,7 @@ import { RequestContext } from 'next/dist/server/base-server';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { idText } from 'typescript';
 import Header from '../../components/Header';
+import { isTokenExpired } from '../../helpers/auth';
 import { api } from '../../server/http';
 import { getTransectionFitered } from '../../server/requests';
 type Transaction = {
@@ -86,8 +87,6 @@ export default function Transactions({ transactions, data }: TransactionProps) {
   const handleSubmit = async () => {
     try {
       const response = await getTransectionFitered(inputSelected, inputValue);
-      // const data = [...result?.data['cash-in'], ...result?.data['cash-out']];
-      // setTransactionsData(data);
       const data = response?.data;
       if (inputSelected === 'cash-in') {
         setTransactionsData([...data['cash-in']]);
@@ -104,7 +103,7 @@ export default function Transactions({ transactions, data }: TransactionProps) {
   };
 
   return (
-    <div className="w-full h-screen bg-[#f0f2f5]">
+    <div className="w-full bg-[#f0f2f5]">
       <Header data={data} locale="transactions" />
       <main className="w-content m-auto relative">
         <section className="mt-[-7rem]">
@@ -214,6 +213,15 @@ export default function Transactions({ transactions, data }: TransactionProps) {
 
 export async function getServerSideProps(ctx: RequestContext) {
   const token = ctx.req.cookies['authToken'];
+  const isValid = isTokenExpired(token);
+  if (!token || isValid) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/login',
+      },
+    };
+  }
 
   try {
     const res = await api.get('/transactions/user', {

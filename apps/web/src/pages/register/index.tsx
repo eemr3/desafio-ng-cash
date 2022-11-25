@@ -18,8 +18,6 @@ export default function Register() {
     validationSchema: schema,
     onSubmit: async () => {
       try {
-        console.log(formik.values);
-
         await registerUser({
           username: formik.values.username,
           password: formik.values.password,

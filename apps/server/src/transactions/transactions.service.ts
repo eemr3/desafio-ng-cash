@@ -25,6 +25,10 @@ export class TransactionsService {
     );
     const account = await this.accountService.findOne(user.userId);
 
+    if (!userResponse) {
+      throw new Error('NotFound');
+    }
+
     if (user.userId === userResponse.id) {
       throw new Error('Forbidden');
     }
@@ -45,7 +49,6 @@ export class TransactionsService {
     });
     const credit = userResponse.balance + createTransactionDto.value;
     const debit = account.balance - createTransactionDto.value;
-    console.log(credit);
 
     await this.accountService.update(userResponse.id, {
       balance: credit,

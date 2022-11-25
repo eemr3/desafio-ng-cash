@@ -1,6 +1,8 @@
 import { useFormik } from 'formik';
 import { useContext } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import { AuthContext } from '../../context/AuthProvider';
+import { responseErrorStatusCode } from '../../helpers/httpStatusCode';
 import { createNewTransatcion } from '../../server/requests';
 import { CustomInput } from '../CustomInput';
 import { schema } from './schema';
@@ -8,22 +10,32 @@ import { schema } from './schema';
 type ModalProps = {
   isOpen: boolean;
   closeModal: () => void;
+  refreshData: () => void;
 };
 
-export function Modal({ isOpen, closeModal }: ModalProps) {
-  const { setIsSuccess, isSuccess } = useContext(AuthContext);
+export function Modal({ isOpen, closeModal, refreshData }: ModalProps) {
   const formik = useFormik({
     initialValues: {
       username: '',
       value: 0,
     },
     validationSchema: schema,
-    onSubmit: async () => {
+    onSubmit: async (values, actions) => {
       try {
-        await createNewTransatcion(formik.values);
-        setIsSuccess(!isSuccess);
+        const response = await createNewTransatcion(values);
+        if (response.status < 300 && response.status >= 200) {
+          refreshData();
+        }
+        actions.resetForm();
+        closeModal();
       } catch (error) {
-        console.log(error);
+        if ((error as any).response.status === 403) {
+          return toast.error(responseErrorStatusCode(403));
+        }
+        if ((error as any).response.status === 404) {
+          return toast.error(responseErrorStatusCode(404, 'Usuário'));
+        }
+        toast.error(responseErrorStatusCode(400));
       }
     },
   });
@@ -34,6 +46,7 @@ export function Modal({ isOpen, closeModal }: ModalProps) {
         fixed top-0 flex items-center justify-center
         z-10"
     >
+      <ToastContainer />
       <div className="md:w-[40%] bg-[#f0f2f5] p-[2.4rem]">
         <div>
           <div className="max-[500px]">

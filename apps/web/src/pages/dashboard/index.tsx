@@ -7,13 +7,19 @@ import { api } from '../../server/http';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthProvider';
 import { Modal } from '../../components/Modal';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
 import Header from '../../components/Header';
 import { TransactionProps } from '../../context/interfaces';
+import { isTokenExpired } from '../../helpers/auth';
 
-export default function Dashboard({ transactions, data }: TransactionProps) {
+export default function Dashboard({ data }: TransactionProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const refreshData = () => {
+    router.replace(router.asPath);
+  };
 
   function closeModal() {
     setIsOpen(false);
@@ -23,14 +29,9 @@ export default function Dashboard({ transactions, data }: TransactionProps) {
     setIsOpen(true);
   }
 
-  const formatDate = (date: string) => {
-    const newDate = new Date(date);
-    return newDate.toLocaleDateString();
-  };
-
   return (
     <div className="w-full md:h-screen bg-[#f0f2f5]">
-      <Modal closeModal={closeModal} isOpen={isOpen} />
+      <Modal closeModal={closeModal} isOpen={isOpen} refreshData={refreshData} />
       <Header data={data} />
       <main className="w-content m-auto relative">
         <section className="mt-[-7rem]">
@@ -72,6 +73,16 @@ export default function Dashboard({ transactions, data }: TransactionProps) {
 
 export async function getServerSideProps(ctx: RequestContext) {
   const token = ctx.req.cookies['authToken'];
+  const isValid = isTokenExpired(token);
+
+  if (!token || isValid) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/login',
+      },
+    };
+  }
 
   try {
     const res = await api.get('/transactions/user', {
@@ -84,6 +95,6 @@ export async function getServerSideProps(ctx: RequestContext) {
     const transactions = [...data['cash-in'], ...data['cash-out']];
     return { props: { transactions, data } };
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }

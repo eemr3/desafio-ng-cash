@@ -2,6 +2,8 @@ import { createContext, ReactNode, useState } from 'react';
 import Router from 'next/router';
 import { api } from '../server/http';
 import Cookies from 'js-cookie';
+import { setCookie } from '../helpers/cookies';
+
 interface IContext {
   signIn: (data: IUser) => Promise<void>;
   user: string | null;
@@ -19,12 +21,14 @@ export const AuthContext = createContext({} as IContext);
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const isAuthetication = !!user;
+
   const signIn = async ({ username, password }: IUser) => {
     const response = await api.post('/login', {
       username,
       password,
     });
-    Cookies.set('authToken', response.data.token);
+
+    setCookie('authToken', response.data.token);
     setUser(response.data);
   };
 

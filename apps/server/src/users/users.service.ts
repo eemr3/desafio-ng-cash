@@ -27,8 +27,8 @@ export class UsersService {
     const userAccountId = await this.update(user.id, { accountId: account.id });
 
     return {
-      ...user,
-      password: null,
+      id: user.id,
+      username: user.username,
       accountId: userAccountId.accountId,
     };
   }
@@ -83,16 +83,21 @@ export class UsersService {
       throw new Error('User not found!');
     }
 
-    return await this.prisma.users.update({
+    const responseUpdate = await this.prisma.users.update({
       where: { id },
       data: updateUserDto,
     });
+    return {
+      id: responseUpdate.id,
+      usermane: responseUpdate.username,
+      accountId: responseUpdate.accountId,
+    };
   }
 
   async remove(id: number) {
     const user = await this.findOne(id);
     if (!user) {
-      throw new Error('User not found!');
+      throw new Error('Username not found!');
     }
 
     return await this.prisma.users.delete({ where: { id } });
