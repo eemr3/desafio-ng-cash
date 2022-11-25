@@ -36,13 +36,11 @@ Aplicação que tem como objetivo realizar transações financeiras entre contas
 
 #### clone o repositório
 
-Usando chave ssh
-
 ```bash
-git@github.com:eemr3/desafio-ng-cash.git
+git clone git@github.com:eemr3/desafio-ng-cash.git
 ```
 
-### Entrar na pasta
+#### Entrar na pasta
 
 ```bash
 cd desafio-ng-cash
@@ -52,6 +50,19 @@ Instalar as dependencias
 
 ```bash
 npm install
+```
+
+Variáveis de Ambiente
+Entre na pasta
+
+```bash
+cd apps/server
+```
+
+E renomei o arquivo
+
+```bash
+.env.example para .env
 ```
 
 Subir containers
@@ -66,7 +77,7 @@ Criar banco de dados
 npm run database
 ```
 
-## Registros
+##### Registros
 
 Você deverá cadastrar usuários na aplicação para relizar transações.
 Exemplo:
