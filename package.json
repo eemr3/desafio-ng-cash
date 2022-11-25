@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "database": "cd apps && cd server && npx prisma migrate dev --name init",
-    "postinstall": "chmod +x apps_install.sh && npm run install:apps",
+    "postinstall": "npm run install:apps",
     "install:apps": "./apps_install.sh",
     "compose:up": "(cd apps && docker-compose up -d --build)",
     "compose:down": "(cd apps && docker-compose down --remove-orphans)"

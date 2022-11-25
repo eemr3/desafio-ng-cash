@@ -52,6 +52,12 @@ Instalar as dependencias
 npm install
 ```
 
+- Observação: Se ocorreru um erro de permisão para o o arquivo `app_install.sh` rode o comando abaixo no terminal, isso para o sitema operacional Linux:
+
+```bash
+chmod +x apps_install.sh
+```
+
 Variáveis de Ambiente
 Entre na pasta
 
