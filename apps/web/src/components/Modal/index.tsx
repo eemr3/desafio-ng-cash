@@ -54,7 +54,7 @@ export function Modal({ isOpen, closeModal, refreshData }: ModalProps) {
       <div className="md:w-[40%] bg-[#f0f2f5] p-[2.4rem]">
         <div>
           <div className="max-[500px]">
-            <h2 className="mt-0">Nova Transaçãp</h2>
+            <h2 className="mt-0">Nova Transação</h2>
             <form onSubmit={formik.handleSubmit}>
               <div className="mt-[0.8rem]">
                 <CustomInput
