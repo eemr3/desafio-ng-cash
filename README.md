@@ -94,6 +94,11 @@ http://localhost:3000
 ##### Registros
 
 Você deverá cadastrar usuários na aplicação para relizar transações.
+Para realizar transações é necessário ter 2 contas pelo menos. Para criar contas dever ter `nome de usuário` e `senha`
+
+- `nome de usuário` tem que ter no minimo 3 caracteres
+- `senha` tem que ter no mínimo 8 caracteres, sendo que pelo menos um número e uma letra minúscula e uma maiúscula.
+
 Exemplo:
 
 ```bash
