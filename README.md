@@ -1,6 +1,6 @@
 # NG.Transfer
 
-Aplicação que tem como objetivo realizar transações financeiras entre contas de usuários da plataforma. Nela pode-se realizar registro de novos usuários, login, transferencia de valores, verificar histórico de transaçoes.
+Aplicação que tem como objetivo realizar transações financeiras entre contas de usuários da plataforma. Nela pode-se realizar registro de novos usuários, login, transferência de valores, verificar histórico de transações. Projeto realizado para um desafio técnico.
 
 ## Requisitos
 
